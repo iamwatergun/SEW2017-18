@@ -22,7 +22,10 @@ class Controller(QtGui.QMainWindow):
 
         self.output = ""
 
+        self.statusString = ""
+
         self.write = self.myView.textBrowser
+        self.status = self.myView.label_4
 
         self.connect()
 
@@ -30,14 +33,26 @@ class Controller(QtGui.QMainWindow):
 
 
     def connect(self):
+        """
+        connects buttons to methods
+        :return: None
+        """
         self.myView.submit.clicked.connect(self.submit_clicked)
         self.myView.reset.clicked.connect(self.reset_clicked)
 
     def submit_clicked(self):
+        """
+        runs the Api with the parameters from InputSpaces
+        and prints output from json to textBrowser
+        :return: None
+        """
+
+        self.statusString = ''
 
         #sets params to Inputs
         self.myModel.setParams(self.startInput.text(),self.endInput.text())
 
+        #reads json response and puts the into a readable format
         response = requests.get(self.myModel.url, self.myModel.params)
         dict =  response.json()
         for route in dict['routes']:
@@ -52,8 +67,20 @@ class Controller(QtGui.QMainWindow):
 
         self.write.insertHtml(self.output)
 
+        #also gets the status
+        for geocode in dict['geocoded_waypoints']:
+            self.statusString += 'Eintrag: ' + geocode['geocoder_status'] + ', '
+
+        self.statusString += 'gesamtstatus: ' + dict['status']
+        self.status.setText(self.statusString)
+
 
     def reset_clicked(self):
+        """
+        resets the Gui and input-variables
+        :return: None
+        """
         self.endInput.clear()
         self.startInput.clear()
+        self.output = ''
         self.write.setText('')

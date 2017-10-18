@@ -1,0 +1,39 @@
+A05 Package
+===========
+
+:mod:`Controller` Module
+------------------------
+
+.. automodule:: A05.Controller
+    :members:
+    :undoc-members:
+    :special-members: __init__
+    :show-inheritance:
+
+:mod:`Main` Module
+------------------
+
+.. automodule:: A05.Main
+    :members:
+    :undoc-members:
+    :special-members: __init__
+    :show-inheritance:
+
+:mod:`Model` Module
+-------------------
+
+.. automodule:: A05.Model
+    :members:
+    :undoc-members:
+    :special-members: __init__
+    :show-inheritance:
+
+:mod:`View` Module
+------------------
+
+.. automodule:: A05.View
+    :members:
+    :undoc-members:
+    :special-members: __init__
+    :show-inheritance:
+

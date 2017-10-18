@@ -9,5 +9,11 @@ class Model:
 
 
     def setParams(self, origin, destination):
+        """
+        setter for parameters in url
+        :param origin: start
+        :param destination: end
+        :return: None
+        """
         self.params['origin'] = origin
         self.params['destination'] = destination

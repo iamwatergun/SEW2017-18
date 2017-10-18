@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>A05.Controller &#8212; A05 1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../modules.html">A05 1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for A05.Controller</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PySide</span> <span class="k">import</span> <span class="n">QtCore</span><span class="p">,</span> <span class="n">QtGui</span>
+<span class="kn">from</span> <span class="nn">PySide.QtGui</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">Model</span>
+<span class="kn">import</span> <span class="nn">View</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">html</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+
+<div class="viewcode-block" id="Controller"><a class="viewcode-back" href="../../A05.html#A05.Controller.Controller">[docs]</a><span class="k">class</span> <span class="nc">Controller</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QMainWindow</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Controller.__init__"><a class="viewcode-back" href="../../A05.html#A05.Controller.Controller.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">myView</span> <span class="o">=</span> <span class="n">View</span><span class="o">.</span><span class="n">Ui_MainWindow</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">myView</span><span class="o">.</span><span class="n">setupUi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">myModel</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">endInput</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">myView</span><span class="o">.</span><span class="n">endInput</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">startInput</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">myView</span><span class="o">.</span><span class="n">startInput</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">statusString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">myView</span><span class="o">.</span><span class="n">textBrowser</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">myView</span><span class="o">.</span><span class="n">label_4</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span></div>
+
+
+
+
+<div class="viewcode-block" id="Controller.connect"><a class="viewcode-back" href="../../A05.html#A05.Controller.Controller.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">myView</span><span class="o">.</span><span class="n">submit</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">submit_clicked</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">myView</span><span class="o">.</span><span class="n">reset</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reset_clicked</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Controller.submit_clicked"><a class="viewcode-back" href="../../A05.html#A05.Controller.Controller.submit_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">submit_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">statusString</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="c1">#sets params to Inputs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">myModel</span><span class="o">.</span><span class="n">setParams</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startInput</span><span class="o">.</span><span class="n">text</span><span class="p">(),</span><span class="bp">self</span><span class="o">.</span><span class="n">endInput</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">myModel</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">myModel</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+        <span class="nb">dict</span> <span class="o">=</span>  <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">route</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;routes&#39;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">leg</span> <span class="ow">in</span> <span class="n">route</span><span class="p">[</span><span class="s1">&#39;legs&#39;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">+=</span> <span class="s1">&#39;Die &lt;b&gt;Gesamtdistanz&lt;/b&gt; beträgt: &lt;b&gt;&#39;</span> <span class="o">+</span> <span class="n">leg</span><span class="p">[</span><span class="s1">&#39;distance&#39;</span><span class="p">][</span><span class="s1">&#39;text&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;&lt;/b&gt;&lt;br&gt;&#39;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">+=</span> <span class="s1">&#39;Die &lt;b&gt;Gesamtdauer&lt;/b&gt; beträgt: &lt;b&gt;&#39;</span> <span class="o">+</span> <span class="n">leg</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">][</span><span class="s1">&#39;text&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;&lt;/b&gt;&lt;br&gt;&#39;</span>
+
+                <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">leg</span><span class="p">[</span><span class="s1">&#39;steps&#39;</span><span class="p">]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">+=</span> <span class="p">(</span><span class="n">step</span><span class="p">[</span><span class="s1">&#39;html_instructions&#39;</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">+=</span> <span class="s1">&#39;, Entfernung: &#39;</span> <span class="o">+</span> <span class="n">step</span><span class="p">[</span><span class="s1">&#39;distance&#39;</span><span class="p">][</span><span class="s1">&#39;text&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;, Dauer: &#39;</span> <span class="o">+</span> <span class="n">step</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">][</span><span class="s1">&#39;text&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;&lt;br&gt;&#39;</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">insertHtml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">geocode</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;geocoded_waypoints&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">statusString</span> <span class="o">+=</span> <span class="s1">&#39;Eintrag: &#39;</span> <span class="o">+</span> <span class="n">geocode</span><span class="p">[</span><span class="s1">&#39;geocoder_status&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">statusString</span> <span class="o">+=</span> <span class="s1">&#39;gesamtstatus: &#39;</span> <span class="o">+</span> <span class="nb">dict</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statusString</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Controller.reset_clicked"><a class="viewcode-back" href="../../A05.html#A05.Controller.Controller.reset_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">reset_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endInput</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">startInput</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../modules.html">A05 1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Rotter Nicolaus.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.
+    </div>
+  </body>
+</html>
